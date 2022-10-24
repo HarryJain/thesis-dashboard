@@ -12,7 +12,8 @@ def about():
 
 @app.route("/proposal/")
 def proposal():
-    return render_template("proposal.html")
+    #return render_template("proposal.html")
+    return app.send_static_file("CPSC_490_Project_Proposal_Final_Advisor.pdf")
 
 @app.route("/teams/")
 def teams():
