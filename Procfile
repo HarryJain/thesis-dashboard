@@ -1,1 +1,1 @@
-web: gunicorn --chdir ./thesis_app webapp:app
+web: gunicorn app:app
