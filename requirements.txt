@@ -12,5 +12,4 @@ sqlalchemy
 matplotlib
 psycopg2
 numpy
-base64
 io
