@@ -10,3 +10,7 @@ requests
 bs4
 sqlalchemy
 matplotlib
+psycopg2
+numpy
+base64
+io
