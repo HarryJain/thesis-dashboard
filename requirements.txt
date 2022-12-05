@@ -12,4 +12,3 @@ sqlalchemy
 matplotlib
 psycopg2
 numpy
-io
