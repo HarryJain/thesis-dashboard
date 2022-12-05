@@ -23,7 +23,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://snaqiuwvjxmcnv:87357d96f1e33
 
 #engine = create_engine('postgresql://postgres:admin@localhost/thesis_nba')
 #engine = create_engine('postgres://snaqiuwvjxmcnv:87357d96f1e3322290c07dd3a0ac6b219655a3b9770641fcc7a7ce96694aff3d@ec2-44-199-22-207.compute-1.amazonaws.com:5432/d7npoqqmolsofp')
-engine = create_engine(environ('SQLALCHEMY_DATABASE_URI'))
+engine = create_engine(environ['SQLALCHEMY_DATABASE_URI'])
 
 
 @app.route('/')
