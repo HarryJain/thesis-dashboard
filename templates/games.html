@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Games
+{% endblock %}
+
+{% block content %}
+
+<div class="row row-cols-1 row-cols-md-2 g-4">
+    {% for index, game in games.iterrows() %}
+    <div class="col">
+        <div class="card">
+            <div class="card-body" style="display: flex; justify-content: space-between">
+                <div style="display: flex; flex-direction: column; align-items: center">
+                    {% set img_src = url_for('static', filename=game['Home Team'] + '.png') %}
+                    <img src="{{ img_src }}" height="50" width="50" class="card-img-top" alt="Home Logo">
+                    <h3>{{ game['Home Team'] }}</h3>
+                    <h5>{{ (elo_ratings[game['Home Team']]) | round | int }}</h5>
+                </div>
+                <div style="display: flex; flex-direction: column; justify-content: space-between; width: 50%">
+                    <h2 style="align-self: center;">{{ game['Start (ET)'] }}</h2>
+                    <div style="display: flex">
+                        <div style="background-color: red; height: 15px; width: {{ game['Home Win %'] * 100 }}%" data-toggle="tooltip" data-placement="top" title="{{ (game['Home Win %'] * 100) | round(1) }}%"></div>
+                        <div style="background-color: blue; height: 15px; width: {{ (1 - game['Home Win %']) * 100 }}%" data-toggle="tooltip" data-placement="top" title="{{ ((1 - game['Home Win %']) * 100) | round(1) }}%"></div>
+                    </div>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center">
+                    {% set img_src = url_for('static', filename=game['Away Team'] + '.png') %}
+                    <img src="{{ img_src }}" height="50" width="50" class="card-img-top" alt="Away Logo">
+                    <h3>{{ game['Away Team'] }}</h3>
+                    <h5>{{ (elo_ratings[game['Away Team']]) | round | int }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+  
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+  
+
+{% endblock %}

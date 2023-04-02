@@ -4,7 +4,7 @@ import pandas               as pd
 import numpy                as np
 import os
 
-from flask                  import Flask, render_template
+from flask                  import Flask, render_template, request
 from requests               import get
 from bs4                    import BeautifulSoup, Comment
 from pandas                 import DataFrame
@@ -12,6 +12,9 @@ from sqlalchemy             import create_engine
 from random                 import random
 from matplotlib.lines       import Line2D
 from matplotlib.figure      import Figure
+from datetime               import datetime
+from utils.elo              import calculate_elo_ratings, get_season_games, expected_score
+from utils.gap_measure      import calculate_gap_measures
 
 
 # Global Variables
@@ -19,12 +22,14 @@ TEAMS = {'ATL': 'Hawks', 'BOS': 'Celtics', 'BRK': 'Nets', 'CHO': 'Hornets', 'CHI
 
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
-database_uri = 'postgresql://snaqiuwvjxmcnv:87357d96f1e3322290c07dd3a0ac6b219655a3b9770641fcc7a7ce96694aff3d@ec2-44-199-22-207.compute-1.amazonaws.com:5432/d7npoqqmolsofp'
+#database_uri = 'postgresql://snaqiuwvjxmcnv:87357d96f1e3322290c07dd3a0ac6b219655a3b9770641fcc7a7ce96694aff3d@ec2-44-199-22-207.compute-1.amazonaws.com:5432/d7npoqqmolsofp'
+database_uri = 'postgresql://pohkbdxjkwmnms:288ae8a77dd3e18169c9fcf455e179425751e1eaf9bc77e95c63b442c48d3bce@ec2-44-214-9-130.compute-1.amazonaws.com:5432/d5imhhjosegjqo'
 app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
 
 #engine = create_engine('postgresql://postgres:admin@localhost/thesis_nba')
 #engine = create_engine('postgres://snaqiuwvjxmcnv:87357d96f1e3322290c07dd3a0ac6b219655a3b9770641fcc7a7ce96694aff3d@ec2-44-199-22-207.compute-1.amazonaws.com:5432/d7npoqqmolsofp')
 engine = create_engine(database_uri)
+#engine = create_engine(database_uri)
 
 
 @app.route('/')
@@ -43,14 +48,33 @@ def proposal():
     return app.send_static_file('CPSC_490_Project_Proposal_Final_Advisor.pdf')
 
 
-@app.route('/teams/')
-@app.route('/teams/<team>')
-def teams(team = None):
-    if team:
-        ''' Scrapes the end of season Elo ratings from FiveThirtyEight
-            and plots the actual streaks compared to simulated streaks for the
-            given team
-        '''
+@app.route('/games/')
+def games():
+    games_df = pd.read_sql(f"""SELECT * FROM schedule WHERE "Date" = '{datetime.now().strftime('%Y-%m-%d')} 00:00:00'""", engine)
+
+    results_df = get_season_games(engine)
+    elo_df, elo_ratings = calculate_elo_ratings(engine, results_df)
+
+    games_df['Home Win %'] = games_df.apply(lambda row: expected_score(elo_ratings[row['Home Team']], elo_ratings[row['Away Team']]), axis = 1)
+
+    return render_template('games.html', games = games_df, elo_ratings = elo_ratings)
+
+
+@app.route('/stats/')
+def stats():
+    df = calculate_gap_measures(engine, type = 'df')
+    print(df)
+    return render_template('statistics.html', statistics = df)
+
+
+@app.route('/teams/', methods = ['GET', 'POST'])
+def teams():
+    ''' Scrapes the end of season Elo ratings from FiveThirtyEight
+        and plots the actual streaks compared to simulated streaks for the
+        given team
+    '''
+    if request.method == 'POST':
+        team = request.form.get('team')
         print(team)
 
         # Scrape Elo ratings and store them as a DataFrame
@@ -69,9 +93,40 @@ def teams(team = None):
         # simulated_avg = simulate_season(team, elo_ratings, team_df[['Game ID', 'Home Team', 'Away Team']], False)
         # plot_streaks(team, team_df[['Game ID', 'Home T', 'Away T', 'Win']], simulated_avg, False)
         #return f"<img src='data:image/png;base64,{plotdata}'/>"
-        return render_template('team.html', plotdata = plotdata)
+        return render_template('teams.html', teams = TEAMS, selected = team, plotdata = plotdata)
     else:
-        return render_template('construction.html')
+        return render_template('teams.html', teams = TEAMS, selected = None)
+
+
+# @app.route('/teams/')
+# @app.route('/teams/<team>')
+# def teams(team = None):
+#     if team:
+#         ''' Scrapes the end of season Elo ratings from FiveThirtyEight
+#             and plots the actual streaks compared to simulated streaks for the
+#             given team
+#         '''
+#         print(team)
+
+#         # Scrape Elo ratings and store them as a DataFrame
+#         elo_ratings = get_elo_table()
+#         print(elo_ratings)
+
+#         # Get the team data from the database and create a boolean column for wins
+#         team_df = get_team_games(engine, team)
+#         team_df['Win'] = team_df.apply(lambda row: win(team, row), axis = 1)
+
+#         # Simulate and plot the win streaks
+#         fig, ax, simulated_avg = simulate_season(team, elo_ratings, team_df[['Game ID', 'Home Team', 'Away Team']])
+#         plotdata = plot_streaks(team, team_df[['Game ID', 'Home T', 'Away T', 'Win']], simulated_avg, fig, ax)
+
+#         # # Simulate and plot the loss streaks
+#         # simulated_avg = simulate_season(team, elo_ratings, team_df[['Game ID', 'Home Team', 'Away Team']], False)
+#         # plot_streaks(team, team_df[['Game ID', 'Home T', 'Away T', 'Win']], simulated_avg, False)
+#         #return f"<img src='data:image/png;base64,{plotdata}'/>"
+#         return render_template('team.html', plotdata = plotdata)
+#     else:
+#         return render_template('construction.html')
 
 def get_soup(url):
     ''' Return the BeautifulSoup object for the given URL by making a get

@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Streak Statistics
+{% endblock %}
+
+{% block content %}
+{{ statistics.to_html(classes='table table-hover table-dark') | safe}}
+{% endblock %}
