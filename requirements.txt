@@ -8,7 +8,7 @@ gunicorn
 pandas
 requests
 bs4
-sqlalchemy
+sqlalchemy<2.0
 matplotlib
 psycopg2
 numpy
