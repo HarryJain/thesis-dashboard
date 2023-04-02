@@ -12,3 +12,4 @@ sqlalchemy
 matplotlib
 psycopg2
 numpy
+scipy
