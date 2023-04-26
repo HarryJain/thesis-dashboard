@@ -5,5 +5,7 @@ Streak Statistics
 {% endblock %}
 
 {% block content %}
-{{ statistics.to_html(classes='table table-hover table-dark') | safe}}
+<div class = 'table-responsive'>
+    {{ statistics.to_html(classes='table table-hover table-dark') | safe}}
+</div>
 {% endblock %}

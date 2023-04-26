@@ -20,8 +20,8 @@ Games
                 <div style="display: flex; flex-direction: column; justify-content: space-between; width: 50%">
                     <h2 style="align-self: center;">{{ game['Start (ET)'] }}</h2>
                     <div style="display: flex">
-                        <div style="background-color: red; height: 15px; width: {{ game['Home Win %'] * 100 }}%" data-toggle="tooltip" data-placement="top" title="{{ (game['Home Win %'] * 100) | round(1) }}%"></div>
-                        <div style="background-color: blue; height: 15px; width: {{ (1 - game['Home Win %']) * 100 }}%" data-toggle="tooltip" data-placement="top" title="{{ ((1 - game['Home Win %']) * 100) | round(1) }}%"></div>
+                        <div style="background-color: {{ colors[game['Home Team']][0] }}; height: 15px; width: {{ game['Home Win %'] * 100 }}%" data-toggle="tooltip" data-placement="top" title="{{ (game['Home Win %'] * 100) | round(1) }}%"></div>
+                        <div style="background-color: {{ colors[game['Away Team']][0] }}; height: 15px; width: {{ (1 - game['Home Win %']) * 100 }}%" data-toggle="tooltip" data-placement="top" title="{{ ((1 - game['Home Win %']) * 100) | round(1) }}%"></div>
                     </div>
                 </div>
                 <div style="display: flex; flex-direction: column; align-items: center">

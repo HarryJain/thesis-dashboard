@@ -3,6 +3,7 @@ from io import BytesIO
 import pandas               as pd
 import numpy                as np
 import os
+import utils.constants      as constants
 
 from flask                  import Flask, render_template, request
 from requests               import get
@@ -26,9 +27,9 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 database_uri = 'postgresql://pohkbdxjkwmnms:288ae8a77dd3e18169c9fcf455e179425751e1eaf9bc77e95c63b442c48d3bce@ec2-44-214-9-130.compute-1.amazonaws.com:5432/d5imhhjosegjqo'
 app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
 
-#engine = create_engine('postgresql://postgres:admin@localhost/thesis_nba')
+engine = create_engine('postgresql://postgres:admin@localhost/thesis_nba')
 #engine = create_engine('postgres://snaqiuwvjxmcnv:87357d96f1e3322290c07dd3a0ac6b219655a3b9770641fcc7a7ce96694aff3d@ec2-44-199-22-207.compute-1.amazonaws.com:5432/d7npoqqmolsofp')
-engine = create_engine(database_uri)
+#engine = create_engine(database_uri)
 #engine = create_engine(database_uri)
 
 
@@ -50,14 +51,16 @@ def proposal():
 
 @app.route('/games/')
 def games():
-    games_df = pd.read_sql(f"""SELECT * FROM schedule WHERE "Date" = '{datetime.now().strftime('%Y-%m-%d')} 00:00:00'""", engine)
+    date_str = datetime.now().strftime('%Y-%m-%d')
+    games_df = pd.read_sql(f"""SELECT * FROM schedule WHERE "Date" = '{date_str} 00:00:00'""", engine)
+    print(games_df)
 
     results_df = get_season_games(engine)
     elo_df, elo_ratings = calculate_elo_ratings(engine, results_df)
 
     games_df['Home Win %'] = games_df.apply(lambda row: expected_score(elo_ratings[row['Home Team']], elo_ratings[row['Away Team']]), axis = 1)
 
-    return render_template('games.html', games = games_df, elo_ratings = elo_ratings)
+    return render_template('games.html', games = games_df, elo_ratings = elo_ratings, colors = constants.COLORS)
 
 
 @app.route('/stats/')
@@ -260,15 +263,15 @@ def plot_streaks(team, result_df, simulated_avg, fig, ax, win = True):
     counts = streak_df.groupby('Length').count()['Win']
     
     # Plot the distribution of streak lengths
-    ax.bar(counts.index, counts, color = 'purple', align = 'edge', width = -0.4)
+    ax.bar(counts.index, counts, color = constants.COLORS[team][0], align = 'edge', width = -0.4)
     ax.set_xlabel('Length')
     ax.set_ylabel('Frequency')
     ax.set_title(f'Distribution of {"Win" if win else "Loss"} Streaks for {team}')
     if ax.get_xticks()[-1] < int(max(counts.index)) + 1:
         ax.set_xticks(np.arange(int(max(counts.index)) + 1))
         ax.set_xticklabels(np.arange(int(max(counts.index)) + 1))
-    legend_elements = [Line2D([0], [0], marker = 'o', color='w', markerfacecolor = 'purple', markersize = 5, label = f'AVG Length: {round(avg_len, 3)}'),
-                       Line2D([0], [0], marker = 'o', color='w', markerfacecolor = 'orange', markersize = 5, label = f'Simulated AVG Length: {round(simulated_avg, 3)}')]
+    legend_elements = [Line2D([0], [0], marker = 'o', color='w', markerfacecolor = constants.COLORS[team][0], markersize = 5, label = f'AVG Length: {round(avg_len, 3)}'),
+                       Line2D([0], [0], marker = 'o', color='w', markerfacecolor = constants.COLORS[team][1], markersize = 5, label = f'Simulated AVG Length: {round(simulated_avg, 3)}')]
     ax.legend(handles = legend_elements)
 
     # Save the plot to a temporary buffer
@@ -335,7 +338,7 @@ def simulate_season(team, elo_ratings, team_df, win = True):
     # Plot the distribution of these average streak length counts
     fig = Figure()
     ax = fig.subplots()
-    ax.bar(counts_df.index, counts_df, color = 'orange', align = 'edge', width = 0.4)
+    ax.bar(counts_df.index, counts_df, color = constants.COLORS[team][1], align = 'edge', width = 0.4)
     ax.set_xticks(np.arange(int(max(counts_df.index)) + 1))
     ax.set_xticklabels(np.arange(int(max(counts_df.index)) + 1))
     
