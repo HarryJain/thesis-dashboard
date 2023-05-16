@@ -1,12 +1,12 @@
 # Module imports
 import base64
-from io import BytesIO
 import pandas               as pd
 import numpy                as np
 import os
 import utils.constants      as constants
 
-from flask                  import Flask, render_template, request
+from io                     import BytesIO
+from flask                  import Flask, render_template, request, redirect
 from requests               import get
 from bs4                    import BeautifulSoup, Comment
 from pandas                 import DataFrame
@@ -17,6 +17,8 @@ from matplotlib.figure      import Figure
 from datetime               import datetime
 from utils.elo              import calculate_elo_ratings, get_season_games, expected_score
 from utils.gap_measure      import calculate_gap_measures
+from utils.measure          import GapMeasure, ClumpMeasure, SecondMoment, Entropy, LogUtility, ClumpMeasure, WWRunsMeasure
+from utils.database_service import NBADatabase
 
 
 
@@ -26,7 +28,7 @@ TEAMS = {'ATL': 'Hawks', 'BOS': 'Celtics', 'BRK': 'Nets', 'CHO': 'Hornets', 'CHI
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 database_uri = 'postgresql://postgres:admin@localhost/thesis_nba'
-database_uri = 'postgresql://pohkbdxjkwmnms:288ae8a77dd3e18169c9fcf455e179425751e1eaf9bc77e95c63b442c48d3bce@ec2-44-214-9-130.compute-1.amazonaws.com:5432/d5imhhjosegjqo'
+#database_uri = 'postgresql://pohkbdxjkwmnms:288ae8a77dd3e18169c9fcf455e179425751e1eaf9bc77e95c63b442c48d3bce@ec2-44-214-9-130.compute-1.amazonaws.com:5432/d5imhhjosegjqo'
 app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
 
 engine = create_engine(database_uri)
@@ -58,6 +60,11 @@ def math():
     return app.send_static_file('Streaky Good Models Math Presentation.pdf')
 
 
+@app.route('/repository/')
+def repository():
+    return redirect('https://github.com/HarryJain/thesis')
+
+
 @app.route('/background/')
 def background():
     return render_template('construction.html')
@@ -78,12 +85,29 @@ def simulations():
     return render_template('construction.html')
 
 
-@app.route('/measure-simulations/')
+@app.route('/measure-simulations/', methods = ['GET', 'POST'])
 def measure_simulations():
-    return render_template('construction.html')
+    if request.method == 'POST':
+        db = NBADatabase()
+        season_df = db.get_season_games(season = '2021-22')
+
+        team = request.form.get('team')
+        print(team)
+
+        measure = request.form.get('measure')
+        print(measure)
+
+        measure = WWRunsMeasure(season_df, name = 'Runs Test') if measure == 'Runs Test' else GapMeasure(season_df, name = 'Gap Measure') if measure == 'Gap Measure' else ClumpMeasure(season_df, name = 'Clump Measure (Wins)') if measure == 'Clump Measure (Wins)' else SecondMoment(season_df, name = 'Second Moment') if measure == 'Second Moment' else Entropy(season_df, name = 'Entropy') if measure == 'Entropy' else LogUtility(season_df, name = 'Log Utility') if measure == 'Log Utility' else None
+        
+        simulated_measure_dfs, p_value, plot_data = measure.monte_carlo_plot(team)
+        print(p_value)
+
+        return render_template('simulate_measure.html', teams = TEAMS, measures = constants.MEASURES, selected_team = team, selected_measure = measure, plotdata = plot_data)
+    else:
+        return render_template('simulate_measure.html', teams = TEAMS, measures = constants.MEASURES, selected_team = None, selected_measure = None)
 
 
-@app.route('/streak_simulations/')
+@app.route('/streak-simulations/')
 def streak_simulations():
     return render_template('construction.html')
 

@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Simulate Measure
+{% endblock %}
+
+{% block content %}
+
+<form action="/measure-simulations/" method="post">
+    <div class="form-group">
+        <label for="team-select" class="form-label mt-4">Choose a Team</label>
+        <select name="team" class="form-select" id="team-select">
+            {% if not selected_team %}
+            <option selected disabled>Select a team</option>
+            {% endif %}
+            {% for team in teams %}
+                {% if team == selected_team %}
+                <option selected>{{ team }}</option>
+                {% else %}
+                <option>{{ team }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+        <label for="measure-select" class="form-label mt-4">Choose a Measure</label>
+        <select name="measure" class="form-select" id="measure-select" onchange="this.form.submit()">
+            {% if not selected %}
+            <option selected disabled>Select a measure</option>
+            {% endif %}
+            {% for measure in measures %}
+                {% if measure == selected_measure %}
+                <option selected>{{ measure }}</option>
+                {% else %}
+                <option>{{ measure }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    </div>
+</form>
+
+{% if selected_team and plotdata %}
+<img style="display: block; margin-left: auto; margin-right: auto; margin-top: 15px; width: 61%;" src="data:image/png;base64,{{ plotdata }}">
+{% endif %}
+
+{% endblock %}
