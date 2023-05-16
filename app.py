@@ -28,7 +28,7 @@ TEAMS = {'ATL': 'Hawks', 'BOS': 'Celtics', 'BRK': 'Nets', 'CHO': 'Hornets', 'CHI
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 database_uri = 'postgresql://postgres:admin@localhost/thesis_nba'
-#database_uri = 'postgresql://pohkbdxjkwmnms:288ae8a77dd3e18169c9fcf455e179425751e1eaf9bc77e95c63b442c48d3bce@ec2-44-214-9-130.compute-1.amazonaws.com:5432/d5imhhjosegjqo'
+database_uri = 'postgresql://pohkbdxjkwmnms:288ae8a77dd3e18169c9fcf455e179425751e1eaf9bc77e95c63b442c48d3bce@ec2-44-214-9-130.compute-1.amazonaws.com:5432/d5imhhjosegjqo'
 app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
 
 engine = create_engine(database_uri)
