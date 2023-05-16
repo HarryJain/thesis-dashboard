@@ -88,7 +88,7 @@ def simulations():
 @app.route('/measure-simulations/', methods = ['GET', 'POST'])
 def measure_simulations():
     if request.method == 'POST':
-        db = NBADatabase()
+        db = NBADatabase(url = database_uri)
         season_df = db.get_season_games(season = '2021-22')
 
         team = request.form.get('team')
