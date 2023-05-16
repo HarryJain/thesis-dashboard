@@ -14,5 +14,4 @@ psycopg2
 numpy
 scipy
 seaborn
-abc
 math
