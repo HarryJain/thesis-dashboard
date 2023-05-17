@@ -18,7 +18,7 @@ class NBAModel(ABC):
         ''' Initializes the NBAModel object by creating a NBADatabase object
                 and getting the season games as a DataFrame
         '''
-        self.db = NBADatabase()
+        self.db = NBADatabase(url = 'postgresql://pohkbdxjkwmnms:288ae8a77dd3e18169c9fcf455e179425751e1eaf9bc77e95c63b442c48d3bce@ec2-44-214-9-130.compute-1.amazonaws.com:5432/d5imhhjosegjqo')
         self.team_games_df = self.db.get_season_games()
 
 

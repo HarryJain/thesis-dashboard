@@ -148,7 +148,7 @@ def simulate_season(team, elo_ratings, team_df, win = True):
 
 def main():
     # Create a database object
-    db = NBADatabase()
+    db = NBADatabase('postgresql://pohkbdxjkwmnms:288ae8a77dd3e18169c9fcf455e179425751e1eaf9bc77e95c63b442c48d3bce@ec2-44-214-9-130.compute-1.amazonaws.com:5432/d5imhhjosegjqo')
 
     # Set the team and year
     team = 'PHO'
