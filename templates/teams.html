@@ -1,12 +1,24 @@
 {% extends "layout.html" %}
 
 {% block title %}
-Simulate Team
+Simulate Team Streaks
 {% endblock %}
 
 {% block content %}
+<h1>Simulate Team Streaks</h1>
 
-<form action="/teams/" method="post">
+<p>
+    Moving beyond just measuring streakiness, we want to create a model for
+    predicting game results that incorporates streakiness. In order to justify
+    this, this page demonstrates the inaccuracy of a static Elo model in
+    predicting streak lengths. In particular, it allows you to choose a team
+    and simulate their 2022-23 season 1000 times using the final Elo ratings
+    for each team to determine win probabilities. It then plots the distribution
+    of the streak lengths, along with the actual streak lengths for the team.
+    Choose a team below to see the results!
+</p>
+
+<form action="/streak-simulations/" method="post">
     <div class="form-group">
         <label for="exampleSelect1" class="form-label mt-4">Simulate 2022-23 Season Streaks</label>
         <select name="team" class="form-select" id="exampleSelect1" onchange="this.form.submit()">

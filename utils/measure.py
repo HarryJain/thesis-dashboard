@@ -652,9 +652,6 @@ def combined_measure_df(season = '2022-2023'):
     gap_measure = GapMeasure(season_df, name = 'Gap Measure')
     gap_df = gap_measure.calculate_measure(season_df, update_dfs = True).rename(columns = {'Measure': 'Gap Measure'})
 
-    clump_measure = ClumpMeasure(season_df, name = 'Clump Measure (Wins)')
-    clump_w_df = clump_measure.calculate_measure(season_df, update_dfs = True).rename(columns = {'Measure': 'Clump Measure (Wins)'})
-
     second_moment = SecondMoment(season_df, name = 'Second Moment')
     second_moment_df = second_moment.calculate_measure(season_df, update_dfs = True).rename(columns = {'Measure': 'Second Moment'})
 
@@ -664,13 +661,10 @@ def combined_measure_df(season = '2022-2023'):
     log_utility = LogUtility(season_df, name = 'Log Utility')
     log_utility_df = log_utility.calculate_measure(season_df, update_dfs = True).rename(columns = {'Measure': 'Log Utility'})
 
-    clump_measure_loss = ClumpMeasure(season_df, name = 'Clump Measure (Losses)', win = False)
-    clump_l_df = clump_measure_loss.calculate_measure(season_df, update_dfs = True).rename(columns = {'Measure': 'Clump Measure (Losses)'})
-
     wwruns_measure = WWRunsMeasure(season_df, name = 'WWRuns Measure')
     wwruns_df = wwruns_measure.calculate_measure(season_df, update_dfs = True).rename(columns = {'Measure': 'Runs Test', 'z': 'Runs Test z', 'p': 'Runs Test p'})
 
-    measure_df = pd.concat([gap_df, clump_w_df, second_moment_df, entropy_df, log_utility_df, clump_l_df, wwruns_df], axis = 1)[['W', 'L', 'Pct', 'n_ws', 'u_ws', 'std_ws', 'n_ls', 'u_ls', 'std_ls', 'Runs Test', 'Runs Test z', 'Runs Test p', 'Gap Measure', 'Clump Measure (Wins)', 'Second Moment', 'Entropy', 'Log Utility', 'Clump Measure (Losses)']]
+    measure_df = pd.concat([gap_df, second_moment_df, entropy_df, log_utility_df, wwruns_df], axis = 1)[['W', 'L', 'Pct', 'n_ws', 'u_ws', 'std_ws', 'n_ls', 'u_ls', 'std_ls', 'Runs Test', 'Runs Test z', 'Runs Test p', 'Gap Measure', 'Second Moment', 'Entropy', 'Log Utility']]
     measure_df = measure_df.rename(columns = {'Pct': 'Win Pct', 'n_ws': 'W Streak Count', 'u_ws': 'W Streak Mean Length', 'std_ws': 'W Streak Length Std', 'n_ls': 'L Streak Count', 'u_ls': 'L Streak Mean Length', 'std_ls': 'L Streak Length Std'})
     return measure_df
 

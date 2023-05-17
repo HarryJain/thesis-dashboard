@@ -5,10 +5,70 @@ Hot Hand
 {% endblock %}
 
 {% block content %}
+<h2>The Hot Hand</h2>
+<p>
+    The "Hot Hand" refers to the idea that a player is more likely to make a shot 
+    if they have made their previous shots. This is a common belief among 
+    basketball fans, yet beginning in the 1980s the dominant mathematical view 
+    was that the hot hand was a fallacy.
+</p>
+
+<p>
+    So does the hot hand really exist? Or is it just an imagined effect? This 
+    page will outline mathematical research proving a substaintial bias in 
+    previous measurements of the hot hand. Then, it allows you to explore this 
+    selection bias by visualizing the expected winning percentages after a
+    winning streak of size k. Finally, it provides a quantitative view of
+    the hot hand for NBA teams by looking at the difference between their
+    expected winning percentage and their actual winning percentage after
+    a winning streak of size k.
+</p>
+
+<h3>The Hot Hand Fallacy</h3>
+<p>
+    The idea of the “Hot Hand Fallacy” was popularized by Gilovich, Vallone, 
+    and Tversky (GVT) in their 1985 paper “The Hot Hand in Basketball: On the 
+    Misperception of Random Sequences.” In this paper, GVT analyzed the shooting
+    percentage of players after a streak of 3 makes or misses. They found that
+    players were no more likely to make a shot after a streak of makes than
+    after a streak of misses. This led them to conclude that the hot hand was
+    a fallacy.
+</p>
+<p>
+    However, later research by Miller and Sanjurjo (2015) found that GVT’s
+    method of measuring the hot hand was biased. In particular, they concluded
+    that due to a combination of a form of sampling without replacement and
+    the overlapping nature of the selection proceedure (e.g. the two
+    possibilities for sampling after a streak of length 3 for a win streak of
+    length 4), the expected sample shooting percentage after a streak of 3
+    makes is less than the player's overall shooting percentage. This result is
+    outlined more rigorously in the theorem below (with a proof sketch in the
+    Final Math Presentation).
+</p>
+
+<img style="display: block; margin-left: auto; margin-right: auto; width: 60%;" src="/static/Streak Selection Bias Theorem.png">
+
+<br><h3>Quantifying the Bias</h3>
+
+<p>
+    Beyond this theorem, Miller and Sanjurjo also found a recursive formula for
+    the expected sample shooting percentage (or team winning percentage) after 
+    a streak of k makes (or wins). Below we graph some of these expected values
+    for different values of k (the streak length) and p (the player's shooting 
+    percentage or the team's winning percentage). 
+</p>
 
 {% if paper_plot_data %}
-<img style="display: block; margin-top: 15px; width: 61%;" src="data:image/png;base64,{{ paper_plot_data }}">
+<img style="display: block; margin-left: auto; margin-right: auto; margin-top: 15px; width: 61%;" src="data:image/png;base64,{{ paper_plot_data }}"><br>
 {% endif %}
+
+<p>
+    To get an idea of how large this bias is for different streak lengths
+    and probabilities, try adjusting these sliders to match your favorite team's
+    statistics (or what you wish they were). Then, click the "Graph" button to
+    see the corresponding graph. The page will reload and display the graph
+    underneath the sliders.
+</p>
 
 <form action="/hot-hand/" method="post">
     <div class="form-group" style="display: flex; flex-direction: row; align-items: flex-end">
@@ -27,7 +87,24 @@ Hot Hand
 </form>
 
 {% if user_plot_data %}
-<img style="display: block; margin-top: 15px; width: 61%;" src="data:image/png;base64,{{ user_plot_data }}">
+<img style="display: block; margin-left: auto; margin-right: auto; margin-top: 15px; width: 61%;" src="data:image/png;base64,{{ user_plot_data }}">
 {% endif %}
+
+<br><h3>NBA Data</h3>
+
+<p>
+    Now, for a more direct application to NBA team streaks, the following 
+    table shows the expected winning percentage and the actual
+    winning percentage for each NBA team after a winning streak of length 4.
+    The expected winning percentage is calculated using the recursive formula
+    from Miller and Sanjurjo (2015) and the data is taken from the 2022-23
+    regular season. Notably, many teams are far above (or far below) their
+    expected winning percentage, demonstrating that some teams are definitely
+    more streaky than others. Overall, the means are slightly above expectaion.
+</p>
+
+<div class = 'table-responsive'>
+    {{ autocorrelation_df.to_html(classes='table table-hover table-dark', na_rep = '') | safe}}
+</div>
 
 {% endblock %}

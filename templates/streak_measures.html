@@ -5,7 +5,99 @@ Streak Measures
 {% endblock %}
 
 {% block content %}
+
+<h1>Streak Measures</h1>
+
+<p>
+    Beyond the aforementioned bias, there are significant limitations in terms
+    of the power of GVT's method of measuring the hot hand. This begs the
+    question: how can we measure the hot hand in a more robust way? This page
+    will describe the basic assumptions of modeling the hot hand statistically,
+    which will then allow us to present several potential more powerful
+    measures, along with research explaining their effectiveness.
+</p>
+
+<h3>Game Results as a Binomial Distribution</h3>
+
+<p>
+    In order to test for the hot hand, we need to model the game results (or
+    equivalently shot results) as random variables. The most natural way to do
+    this (and the way that GVT did it) is to model each shot as a Bernoulli
+    trial, where the probability of success is the overall winning percentage
+    (or shooting percentage). Crucially, this assumes that each trial has
+    the same probability of success, and that the trials are independent.
+</p>
+
+<p>
+    If the hot hand exists, then these assumptions are violated. In particular,
+    there are two possibilities for how the hot hand could affect the game
+    results:
+</p>
+
+<ol>
+    <li><b>Autocorrelation:</b> the current trial depends on the outcome of the previous trials
+    <ul>
+        <li>i.e. a hot streak leads to increased or decreased future performance</li>
+    </ul></li>
+    <li><b>Non-stationarity:</b> the probability of success changes over time
+    <ul>
+            <li>i.e. a team (or player) improves or regresses based on trades, injuries, etc.</li>
+    </ul></li>
+</ol>
+
+<h3>Potential Measures</h3>
+
+<p>
+    In light of these two main deviations from the Binomial model, we want
+    to establish statistical tests that can detect these deviations. One
+    traditional test for "streakiness" has been the Wald-Wolfowitz Runs Test,
+    which tests for autocorrelation by counting the number of run (streaks).
+    However, this test is not very powerful, and is not able to detect
+    non-stationarity.
+</p>
+
+<p>
+    Thus, as outlined in Zhang, Bradlow, and Small (2013), we will focus on 
+    measures of "clumpiness" that have the following four characteristics that 
+    allow for powerful determination of the hot hand:
+</p>
+
+<ol>
+    <li><b>Minimum:</b> the measure should be minimized when events (wins/losses) are equally spaced></li>
+    <li><b>Maximum:</b> the measure should be maximized if all the events are clumped together</li>
+    <li><b>Continuity:</b> a small shift in events should only change the measure a small amount</li>
+    <li><b>Convergence:</b> as events move closer, the measure should decrease</li>
+</ol>
+
+<img style="display: block; margin-left: auto; margin-right: auto; width: 60%;" src="/static/Suitable Streak Measures Theorem.png"><br>
+
+<p>
+    Moreover, they proved the above theorem, which gives us a wide range of 
+    potential measures to choose from, originating from a variety of different
+    sources. This project in particular implements the following three measures:
+</p>
+
+<ol>
+    <li><b>Second moment:</b> often utilized to describe and distinguish probability distributions</li>
+    \[L_2 = \sum_{i = 1}^{n + 1} x_i^2\]
+    <li><b>Entropy:</b> a measure of uncertainty and disorder used in information theory</li>
+    \[H_p = \sum_{i = 1}^{n + 1} x_i\log{x_i}\]
+    <li><b>Log utility:</b> used in economics, it “normalizes” the ranges being considered</li>
+    \[M = -\sum_{i = 1}^{n + 1} \log(x_i)\]
+</ol>
+
+<h3>Application to NBA Data</h3>
+<p>
+    Below, we apply these measures to the NBA data, showing the results for
+    each team in the 2022-23 season. We also include the results for the
+    Runs Test, which has a closed-form for the p-values; however, none of
+    them are statistically significant, demonstrating its underpoweredness.
+    For better significance tests, see the 
+    <a href="/measure-simulations">Measure Simulations</a> page.
+</p>
+
 <div class = 'table-responsive'>
     {{ measure_df.to_html(classes='table table-hover table-dark') | safe}}
 </div>
+
 {% endblock %}

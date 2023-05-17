@@ -2,13 +2,14 @@
 import pandas                   as pd
 import utils.constants          as constants
 
-from flask                      import Flask, render_template, request, redirect
-from utils.elo                  import expected_score
-from utils.measure              import GapMeasure, ClumpMeasure, SecondMoment, Entropy, LogUtility, ClumpMeasure, WWRunsMeasure, combined_measure_df
-from utils.database_service     import NBADatabase
-from utils.streak_simulation    import get_elo_table, simulate_season, plot_streaks
-from utils.model                import EloModel
-from utils.selection_bias       import plot_expectation, paper_expectation_plot
+from flask                          import Flask, render_template, request, redirect
+from utils.elo                      import expected_score
+from utils.measure                  import GapMeasure, ClumpMeasure, SecondMoment, Entropy, LogUtility, ClumpMeasure, WWRunsMeasure, combined_measure_df
+from utils.database_service         import NBADatabase
+from utils.streak_simulation        import get_elo_table, simulate_season, plot_streaks
+from utils.model                    import EloModel
+from utils.selection_bias           import plot_expectation, paper_expectation_plot
+from utils.autocorrelation_tests    import autocorrelation_dataframe
 
 
 
@@ -68,11 +69,17 @@ def hot_hand():
         k = int(request.form.get('k_num'))
         p = float(request.form.get('p_num'))
         user_plot_data = plot_expectation(k = k, p = p, return_fig = True)
+
+        autocorrelation_df = autocorrelation_dataframe(4)
         
-        return render_template('hot_hand.html', k_value = k, p_value = p, paper_plot_data = paper_plot_data, user_plot_data = user_plot_data)
+        return render_template('hot_hand.html', k_value = k, p_value = p, paper_plot_data = paper_plot_data, user_plot_data = user_plot_data, autocorrelation_df = autocorrelation_df)
     else:
         paper_plot_data = paper_expectation_plot()
-        return render_template('hot_hand.html', k_value = 1, p_value = 0.5, paper_plot_data = paper_plot_data)
+
+        autocorrelation_df = autocorrelation_dataframe(4)
+        
+
+        return render_template('hot_hand.html', k_value = 1, p_value = 0.5, paper_plot_data = paper_plot_data, autocorrelation_df = autocorrelation_df)
 
 
 @app.route('/streak-measures/')
@@ -108,14 +115,43 @@ def measure_simulations():
         return render_template('simulate_measure.html', teams = constants.TLAS, measures = constants.MEASURES, selected_team = None, selected_measure = None)
 
 
-@app.route('/streak-simulations/')
+@app.route('/streak-simulations/', methods = ['GET', 'POST'])
 def streak_simulations():
-    return render_template('construction.html')
+    ''' Scrapes the end of season Elo ratings from FiveThirtyEight
+        and plots the actual streaks compared to simulated streaks for the
+        given team
+    '''
+    if request.method == 'POST':
+        team = request.form.get('team')
+        print(team)
 
+        # Scrape Elo ratings and store them as a DataFrame
+        elo_ratings = get_elo_table()
+        print(elo_ratings)
 
-@app.route('/predictions/')
+        # Get the team data from the database and create a boolean column for wins
+        team_df = db.get_team_games(team, win = 'Team Win')
+
+        # Simulate and plot the win streaks
+        fig, ax, simulated_avg = simulate_season(team, elo_ratings, team_df[['Game ID', 'Home Team', 'Away Team']])
+        plotdata = plot_streaks(team, team_df[['Game ID', 'Home T', 'Away T', 'Team Win']], simulated_avg, fig, ax)
+
+        return render_template('teams.html', teams = constants.TLAS, selected = team, plotdata = plotdata)
+    else:
+        return render_template('teams.html', teams = constants.TLAS, selected = None)
+    
+
+@app.route('/game-predictions/')
 def predictions():
-    return render_template('construction.html')
+    games_df = db.get_today_games()
+    print(games_df)
+
+    elo_model = EloModel()
+    elo_model.execute_model()
+
+    games_df['Home Win %'] = games_df.apply(lambda row: expected_score(elo_model.ratings[row['Home Team']], elo_model.ratings[row['Away Team']]), axis = 1)
+
+    return render_template('games.html', games = games_df, elo_ratings = elo_model.ratings, colors = constants.COLORS)
 
 
 @app.route('/game_predictions/')

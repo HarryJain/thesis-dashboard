@@ -5,6 +5,52 @@ Simulate Measure
 {% endblock %}
 
 {% block content %}
+<h1>Measure Simulations</h1>
+
+<p>
+    Given the mathematical derivations of appropriate measures of the hot hand,
+    we can now apply these measures to real NBA data to see if they are 
+    effective. This page allows you to select a team and a measure, and then
+    see a Monte Carlo simulation of the measure applied to the team's data,
+    along with the actual measure value for the team.
+</p>
+
+<h3>Permutation and Monte Carlo Tests</h3>
+
+<p>
+    A permutation test is an exact statistical hypothesis test that establishes 
+    a distribution of the test statistic by calculating all possible values 
+    under rearrangements of the observed data. It is
+</p>
+
+<ul>
+    <li>Non-parametric (unlike traditional t-test, F-test, z-test)</li>
+    <li>Computationally intensive and challenging to get confidence intervals and other distribution information</li>
+</ul>
+
+<p>
+    Monte Carlo sampling is an asymptotically equivalent permutation test that 
+    takes a random sample of possible permutations. It can be used for a 
+    confidence interval for the p-value of the Binomial distribution, e.g. for 
+    10000 random permutations and an estimated p-value of 0.05, the CI would be
+    \[\left[\hat{p} - z\sqrt{\frac{0.05(1 - 0.05)}{10000}}, \hat{p} + z\sqrt{\frac{0.05(1 - 0.05)}{10000}}\right] = [0.045, 0.055]\]
+</p>
+
+<h3>Significance Tests</h3>
+
+<p>
+    Now, we can use Monte Carlo simulations to test whether a given measure
+    for a given team implies high or low levels of streakiness. By choosing
+    a team and a measure from the dropdown below, you begin a simulation in
+    which the game results for the given team in the 2022-23 season are
+    randomly permuted 200 times. For each permutation, the measure is
+    calculated and the number of times the measure is greater than or equal
+    to the actual measure is counted. This count is then divided by 200 to
+    get the p-value of the actual measure. If the p-value is less than 0.05,
+    the measure is considered significant at the 95% confidence level. Try
+    it out below to see a histogram of the simulated measure values, the
+    actual measure value, and the p-value!
+</p>
 
 <form action="/measure-simulations/" method="post">
     <div class="form-group">
