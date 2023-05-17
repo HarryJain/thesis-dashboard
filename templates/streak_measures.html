@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Streak Measures
+{% endblock %}
+
+{% block content %}
+<div class = 'table-responsive'>
+    {{ measure_df.to_html(classes='table table-hover table-dark') | safe}}
+</div>
+{% endblock %}

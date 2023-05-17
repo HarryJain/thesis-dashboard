@@ -4,6 +4,29 @@ Home page
 {% endblock %}
 {% block content %}
 <h3 style="text-align: center;">Welcome to the webpage for Harry Jain's senior thesis in CS and Math!</h3>
-<h6 style="text-align: center;">While most of the site (and thesis) is still under construction, bookmark this page to follow along with progress and learn all about streaks in the NBA...</h6>
-<img style="display: block; margin-left: auto; margin-right: auto; width: 60%;" src="/static/construction.jpg">
+<p>This website presents a mixture of research and analysis from my thesis in an interactive format. Take a look around to get an idea of some of the most interesting takeaways, simulations, and more. The pages are organized as follows:</p>
+<ul>
+    <li><b>Home:</b> This page, which gives a brief overview of the project and descriptions of the other pages
+    <li><b>About:</b> A section of documentation regarding the project, its goals, and some key takeaways</li>
+    <ul>
+        <li><b>Project Proposal:</b> The original proposal for the project, as submitted in Fall 2022</li>
+        <li><b>Midterm Presentation:</b> A presentation given in Winter 2022, which gives an overview of the project and some preliminary results</li>
+        <li><b>Final Math Presentation:</b> The final presentation for the Math department in Spring 2023, which gives a more in-depth look at the math behind the project</li>
+        <li><b>GitHub Repository:</b> The GitHub repository containing all the analysis code utilized for this project and this website</li>
+    </ul></li>
+    <li><b>Background:</b> A section addressing previous research on measuring streaks in sports, with a rebuttal of some misconceptions and an application of related research to NBA games</li>
+    <ul>
+        <li><b>The Hot Hand:</b> A mathematical rebuttal of the supposed "Hot Hand Fallacy" using the research of J.B. Miller and A. Sanjurjo</li>
+        <li><b>Streak Measures:</b> An overview of some potential mathematical measures of streaks and desirable properties outlined by Zhang, Bradlow, and Small</li>
+    </ul></li>
+    <li><b>Simulations:</b> A section including several simulations for various statistics and results regarding NBA streaks</li>
+    <ul>
+        <li><b>Measure Simulations:</b> Statistical significance tests for a variety of streak measures described in the <b>Background</b> section</li>
+        <li><b>Streak Simulations:</b> A comparison of streak length proportions under the assumption of constant Elo ratings with the actual streak lengths of teams</li>
+    </ul></li>
+    <li><b>Predictions:</b> A listing of today's games with win probabilities according to the current (gap-adjusted) Elo rating</li>
+    <li><b>Conclusions:</b> The most important takeaways from the project, along with references</li>
+</ul>
+<p>As with all great teams, this project is under constant construction, so bookmark this page to follow along with progress and learn all about streaks in the NBA...</p>
+<img style="display: block; margin-left: auto; margin-right: auto; width: 45%;" src="/static/construction.jpg">
 {% endblock %}

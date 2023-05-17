@@ -5,6 +5,8 @@ Games
 {% endblock %}
 
 {% block content %}
+<h1 style="text-align: center">Game Predictions</h1>
+<p>This page provides predictions for today's games based on current Elo scores, which are listed below the team logos and names. In order to see the exact win probabilities, hover over or click on the corresponding bar for your desired team.</p>
 
 <div class="row row-cols-1 row-cols-md-2 g-4">
     {% for index, game in games.iterrows() %}

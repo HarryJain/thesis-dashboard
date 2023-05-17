@@ -143,7 +143,7 @@ class StreakMeasure(ABC):
         # Plot the distribution of measure values, along with the actual measure
         fig = Figure()
         ax = fig.subplots()
-        ax.hist([ simulated_measure_df.loc['Simulated Team', 'Measure'] for simulated_measure_df in simulated_measure_dfs ], color = constants.COLORS[team][0] if team in constants.TLAS else 'b')
+        ax.hist([ simulated_measure_df.loc['Simulated Team', 'Measure'] for simulated_measure_df in simulated_measure_dfs ], color = constants.COLORS[team][0] if team in constants.TLAS else 'b', density = True)
         ax.axvline(x = self.measure_df.loc[team, 'Measure'], color = constants.COLORS[team][1] if team in constants.TLAS else 'r')
         ax.set_xlabel(f'{self.name} Value')
         ax.set_ylabel('Relative Frequency')
@@ -645,11 +645,40 @@ def plot_histogram(df, column, x_label = None, y_label = None, title = None):
     plt.show()
 
 
+def combined_measure_df(season = '2022-2023'):
+    db = NBADatabase()
+    season_df = db.get_season_games(season = season)
+
+    gap_measure = GapMeasure(season_df, name = 'Gap Measure')
+    gap_df = gap_measure.calculate_measure(season_df, update_dfs = True).rename(columns = {'Measure': 'Gap Measure'})
+
+    clump_measure = ClumpMeasure(season_df, name = 'Clump Measure (Wins)')
+    clump_w_df = clump_measure.calculate_measure(season_df, update_dfs = True).rename(columns = {'Measure': 'Clump Measure (Wins)'})
+
+    second_moment = SecondMoment(season_df, name = 'Second Moment')
+    second_moment_df = second_moment.calculate_measure(season_df, update_dfs = True).rename(columns = {'Measure': 'Second Moment'})
+
+    entropy = Entropy(season_df, name = 'Entropy')
+    entropy_df = entropy.calculate_measure(season_df, update_dfs = True).rename(columns = {'Measure': 'Entropy'})
+
+    log_utility = LogUtility(season_df, name = 'Log Utility')
+    log_utility_df = log_utility.calculate_measure(season_df, update_dfs = True).rename(columns = {'Measure': 'Log Utility'})
+
+    clump_measure_loss = ClumpMeasure(season_df, name = 'Clump Measure (Losses)', win = False)
+    clump_l_df = clump_measure_loss.calculate_measure(season_df, update_dfs = True).rename(columns = {'Measure': 'Clump Measure (Losses)'})
+
+    wwruns_measure = WWRunsMeasure(season_df, name = 'WWRuns Measure')
+    wwruns_df = wwruns_measure.calculate_measure(season_df, update_dfs = True).rename(columns = {'Measure': 'Runs Test', 'z': 'Runs Test z', 'p': 'Runs Test p'})
+
+    measure_df = pd.concat([gap_df, clump_w_df, second_moment_df, entropy_df, log_utility_df, clump_l_df, wwruns_df], axis = 1)[['W', 'L', 'Pct', 'n_ws', 'u_ws', 'std_ws', 'n_ls', 'u_ls', 'std_ls', 'Runs Test', 'Runs Test z', 'Runs Test p', 'Gap Measure', 'Clump Measure (Wins)', 'Second Moment', 'Entropy', 'Log Utility', 'Clump Measure (Losses)']]
+    measure_df = measure_df.rename(columns = {'Pct': 'Win Pct', 'n_ws': 'W Streak Count', 'u_ws': 'W Streak Mean Length', 'std_ws': 'W Streak Length Std', 'n_ls': 'L Streak Count', 'u_ls': 'L Streak Mean Length', 'std_ls': 'L Streak Length Std'})
+    return measure_df
+
 
 def main():
     team = 'BOS'
     db = NBADatabase()
-    season_df = db.get_season_games(season = '2022-23')
+    season_df = db.get_season_games(season = '2022-2023')
 
     gap_measure = GapMeasure(season_df, name = 'Gap Measure')
     gap_df = gap_measure.calculate_measure(season_df, update_dfs = True).rename(columns = {'Measure': 'Gap Measure'})

@@ -2,6 +2,7 @@
 import  pandas      as pd
 
 from    sqlalchemy  import create_engine
+from    datetime    import datetime
 
 
 
@@ -87,14 +88,14 @@ class NBADatabase(DatabaseService):
     #     return team_df
 
     
-    def get_team_games(self, team, season = '2021-22', playoffs = False, date = None, win = 'Home Win'):
+    def get_team_games(self, team, season = '2022-2023', playoffs = False, date = None, win = 'Home Win'):
         ''' Returns a DataFrame of all the games for the given team and season
                 with all the columns from the database, marking whether the
                 given team won the game
                 
             team -- a TLA string representing the team whose data to get
             season -- a string representing the season years as YYYY-YY, defaults
-                to 2021-22
+                to 2022-2023
             playoffs -- a boolean representing whether to get playoff games or
                 regular season games, defaulting to regular season (False)
             date -- a string representing the date to get games up to as YYYY-MM-DD,
@@ -118,12 +119,12 @@ class NBADatabase(DatabaseService):
         return int(row['Home T']) > int(row['Away T'])
 
 
-    def get_season_games(self, season = '2021-22', playoffs = False, date = None):
+    def get_season_games(self, season = '2022-2023', playoffs = False, date = None):
         ''' Returns a DataFrame of all the games for the given season
                 with all the columns from the database
             
             season -- a string representing the season years as YYYY-YY, defaults
-                to 2021-22
+                to 2022-2023
             playoffs -- a boolean representing whether to get playoff games or
                 regular season games, defaulting to regular season (False)
             date -- a string representing the date to get games up to as YYYY-MM-DD,
@@ -133,6 +134,25 @@ class NBADatabase(DatabaseService):
         season_df = self.execute_query(f"""SELECT * FROM boxscores WHERE "Season" = '{season}' and "Playoffs" = {playoffs}{date_str}""")
         season_df['Home Win'] = season_df.apply(lambda row: self.home_win(row), axis = 1)
         return season_df
+    
+
+    def get_date_games(self, date):
+        ''' Returns a DataFrame of all the games for the given date
+                with all the columns from the schedule table of the database
+            
+            date -- a string representing the date to get games for as 
+                YYYY-MM-DD
+        '''
+        season_df = self.execute_query(f"""SELECT * FROM schedule WHERE "Date" = '{date} 00:00:00'""")
+        return season_df
+    
+
+    def get_today_games(self):
+        ''' Returns a DataFrame of all the games for the current date
+                with all the columns from the schedule table of the database
+        '''
+        date = datetime.now().strftime('%Y-%m-%d')
+        return self.get_date_games(date)
 
 
 
@@ -142,8 +162,11 @@ def main():
             table
     '''
     database = NBADatabase()
-    season_df = database.get_season_games('2021-22')
+    season_df = database.get_season_games('2021-2022')
     print(season_df)
+
+    today_df = database.get_today_games()
+    print(today_df)
 
     #database.update_table('boxscores', df)
 

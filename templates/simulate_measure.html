@@ -8,7 +8,7 @@ Simulate Measure
 
 <form action="/measure-simulations/" method="post">
     <div class="form-group">
-        <label for="team-select" class="form-label mt-4">Choose a Team</label>
+        <label for="team-select" class="form-label mt-4">Team</label>
         <select name="team" class="form-select" id="team-select">
             {% if not selected_team %}
             <option selected disabled>Select a team</option>
@@ -21,7 +21,7 @@ Simulate Measure
                 {% endif %}
             {% endfor %}
         </select>
-        <label for="measure-select" class="form-label mt-4">Choose a Measure</label>
+        <label for="measure-select" class="form-label mt-4">Measure</label>
         <select name="measure" class="form-select" id="measure-select" onchange="this.form.submit()">
             {% if not selected %}
             <option selected disabled>Select a measure</option>

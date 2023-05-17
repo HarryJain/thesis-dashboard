@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Hot Hand
+{% endblock %}
+
+{% block content %}
+
+{% if paper_plot_data %}
+<img style="display: block; margin-top: 15px; width: 61%;" src="data:image/png;base64,{{ paper_plot_data }}">
+{% endif %}
+
+<form action="/hot-hand/" method="post">
+    <div class="form-group" style="display: flex; flex-direction: row; align-items: flex-end">
+        <div style="margin: 0px 10px;">
+            <label for="k_range" class="form-label">Streak Length</label><br>
+            <input type="range" name="k_range" min=1 max=8 value={{ k_value }} id="k_range" oninput="this.form.k_num.value=this.value"/>
+            <input type="number" name="k_num" min=1 max=8 value={{ k_value }} id="k_num" oninput="this.form.k_range.value=this.value"/>
+        </div>
+        <div style="margin: 0px 10px;">
+            <label for="p_range" class="form-label">Win Probability</label><br>
+            <input type="range" name="p_range" min=0 max=1 value={{ p_value }} step=0.01 id="p_range" oninput="this.form.p_num.value=this.value"/>
+            <input type="number" name="p_num" min=0 max=1 value={{ p_value }} step=0.01 id="p_num" oninput="this.form.p_range.value=this.value"/>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin: 0px 10px; height: 50%;">Graph</button>
+    </div>
+</form>
+
+{% if user_plot_data %}
+<img style="display: block; margin-top: 15px; width: 61%;" src="data:image/png;base64,{{ user_plot_data }}">
+{% endif %}
+
+{% endblock %}
