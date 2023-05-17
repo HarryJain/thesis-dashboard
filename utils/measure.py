@@ -646,7 +646,7 @@ def plot_histogram(df, column, x_label = None, y_label = None, title = None):
 
 
 def combined_measure_df(season = '2022-2023'):
-    db = NBADatabase()
+    db = NBADatabase(url = 'postgresql://pohkbdxjkwmnms:288ae8a77dd3e18169c9fcf455e179425751e1eaf9bc77e95c63b442c48d3bce@ec2-44-214-9-130.compute-1.amazonaws.com:5432/d5imhhjosegjqo')
     season_df = db.get_season_games(season = season)
 
     gap_measure = GapMeasure(season_df, name = 'Gap Measure')
@@ -671,7 +671,7 @@ def combined_measure_df(season = '2022-2023'):
 
 def main():
     team = 'BOS'
-    db = NBADatabase()
+    db = NBADatabase('postgresql://pohkbdxjkwmnms:288ae8a77dd3e18169c9fcf455e179425751e1eaf9bc77e95c63b442c48d3bce@ec2-44-214-9-130.compute-1.amazonaws.com:5432/d5imhhjosegjqo')
     season_df = db.get_season_games(season = '2022-2023')
 
     gap_measure = GapMeasure(season_df, name = 'Gap Measure')
