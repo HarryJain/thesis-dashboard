@@ -51,6 +51,11 @@ def math():
     return app.send_static_file('Streaky Good Models Math Presentation.pdf')
 
 
+@app.route('/report/')
+def report():
+    return app.send_static_file('CPSC_490_Final_Report.pdf')
+
+
 @app.route('/repository/')
 def repository():
     return redirect('https://github.com/HarryJain/thesis')
